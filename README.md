@@ -1,1 +1,1 @@
-## My own algorithm study
+## A many-objective particle swarm optimization with vector angles
