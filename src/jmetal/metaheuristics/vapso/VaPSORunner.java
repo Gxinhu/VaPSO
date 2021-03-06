@@ -15,7 +15,7 @@ import jmetal.operators.crossover.CrossoverFactory;
 import jmetal.operators.mutation.MutationFactory;
 import jmetal.problems.ProblemFactory;
 import jmetal.qualityIndicator.QualityIndicator;
-import jmetal.qualityIndicator.fastHypervolume.wfg.WFGHv;
+import jmetal.qualityIndicator.fastHypervolume.wfg.wfgHvPlatEMO;
 import jmetal.qualityIndicator.hypeHypervolume.HypeHV;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
@@ -63,7 +63,7 @@ public class VaPSORunner {
 			long endTime = System.currentTimeMillis() - initTime;
 
 			logger.info("Total run time is" + endTime + "ms");
-			WFGHv wfgHv = new WFGHv(population.writeObjectivesToMatrix(), problem.getName());
+			wfgHvPlatEMO wfgHv = new wfgHvPlatEMO(population.writeObjectivesToMatrix(), problem.getName());
 			assert indicators != null;
 			HypeHV hype = new HypeHV(population.writeObjectivesToMatrix(), problem.getName());
 			double HV;
@@ -79,6 +79,7 @@ public class VaPSORunner {
 					+ "\nIGD        : " + indicators.getCEC_IGD(population)
 					+ "\nSpread     : " + indicators.getGeneralizedSpread(population)
 					+ "\nSpace        : " + indicators.getSpace(population)
+					+ "\nIGD+        : " + indicators.getInvertedGenerationalDistancePlus(population)
 					+ "\nNumberOfPF        : " + population.size()
 			);
 			pythonplot plot = new pythonplot(population.writeObjectivesToMatrix(), problem.getName());

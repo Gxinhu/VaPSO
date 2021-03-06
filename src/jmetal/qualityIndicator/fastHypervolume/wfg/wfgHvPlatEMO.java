@@ -1,4 +1,4 @@
-package jmetal.qualityIndicator.hypeHypervolume;
+package jmetal.qualityIndicator.fastHypervolume.wfg;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
@@ -15,19 +15,19 @@ import java.util.stream.IntStream;
 /**
  * this is calualate HV in RVEA
  */
-public class HypeHV {
+public class wfgHvPlatEMO {
     public jmetal.qualityIndicator.util.MetricsUtil utils_;
-    private double[][] pf_;
-    private double[][] pfMatrix_ = null;
-    private String problemNames = null;
+    double[][] pf_;
+    double[][] pfMatrix_ = null;
+    String problemNames;
 
-    public HypeHV(double[][] paretoFront, double[][] pfMatrix) {
+    public wfgHvPlatEMO(double[][] paretoFront, double[][] pfMatrix) {
         pf_ = paretoFront;
         pfMatrix_ = pfMatrix;
         utils_ = new jmetal.qualityIndicator.util.MetricsUtil();
     } // Constructor
 
-    public HypeHV(double[][] solutionFront, String problemName) {
+    public wfgHvPlatEMO(double[][] solutionFront, String problemName) {
         problemNames = problemName;
         pf_ = solutionFront;
         utils_ = new jmetal.qualityIndicator.util.MetricsUtil();
@@ -55,7 +55,7 @@ public class HypeHV {
 
         }
 
-        double hv = 0;
+        double hv;
         int number = pf_[0].length;
         Solution referencePoint1 = new Solution(number);
         double[] maxObjectives = new double[number];
@@ -92,10 +92,10 @@ public class HypeHV {
             }
 
         } else {
-            for (double[] doubles : pfMatrix_) {
+            for (int i = 0; i < pfMatrix_.length; i++) {
                 for (int j = 0; j < number; j++) {
-                    if (maxObjectives[j] < doubles[j]) {
-                        maxObjectives[j] = doubles[j];
+                    if (maxObjectives[j] < pfMatrix_[i][j]) {
+                        maxObjectives[j] = pfMatrix_[i][j];
                     }
                 }
             }
@@ -115,8 +115,6 @@ public class HypeHV {
                 sb.get(j).setObjective(k, (sb.get(j).getObjective(k) - minimumValues[k]) / (1.1 * referencePoint1.getObjective(k) - minimumValues[k]));
             }
         }
-        SolutionSet invertedFront;
-        //invertedFront = utils_.invertedFront(pf_,number);
         for (int j = 0; j < pf_.length; j++) {
             for (int k = 0; k < number; k++) {
                 if (sb.get(j).getObjective(k) - 1e-10 > (1.0)) {
@@ -128,9 +126,6 @@ public class HypeHV {
                     break;
                 }
             }
-        }
-        if (sb.size() == 0) {
-            return 0;
         }
         for (int j = 0; j < number; j++)
         //referencePoint1.setObjective(j,2.0*j+10);
@@ -178,8 +173,9 @@ public class HypeHV {
             hv = hv2point(sb.get(0), referencePoint1) + hv2point(sb.get(1), referencePoint1) + hv2point(sb.get(2), referencePoint1)
                     - hv2point(p01, referencePoint1) - hv2point(p02, referencePoint1) - hv2point(p12, referencePoint1) + hv2point(p012, referencePoint1);
         } else {
-            HypEHypervolume hype = new HypEHypervolume();
-            hv = hype.estimateHypervolume(sb, referencePoint1, 1000000);
+            WFGHV1 wfghv = new WFGHV1(number, sb.size());
+            Front1 front = new Front1(sb.size(), number, sb);
+            hv = wfghv.getHV(front, referencePoint1);
         }
         return hv;
     } // CalculateHypervolume
